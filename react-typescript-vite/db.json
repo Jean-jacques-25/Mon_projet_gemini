@@ -1,0 +1,380 @@
+{
+  "users": {
+    "55256871": {
+      "phone": "55256871",
+      "name": "A. Jean",
+      "email": "jeanjacquesaguin30@gmail.com",
+      "role": "agent",
+      "points": 0,
+      "level": "BRONZE",
+      "score": 100,
+      "isSuspended": false,
+      "createdAt": "2026-05-19T20:11:46.422Z"
+    },
+    "+22999999999": {
+      "phone": "+22999999999",
+      "name": "Admin DataBroker229",
+      "email": "jeanjacquesaguin30@gmail.com",
+      "role": "admin",
+      "points": 0,
+      "level": "ELITE",
+      "score": 100,
+      "isSuspended": false,
+      "createdAt": "2026-05-10T12:00:00Z"
+    },
+    "+22961000001": {
+      "phone": "+22961000001",
+      "name": "Saliou Koffi",
+      "email": "salioukoffi@gmail.com",
+      "role": "agent",
+      "points": 420,
+      "level": "BRONZE",
+      "score": 94,
+      "isSuspended": false,
+      "createdAt": "2026-05-11T09:00:00Z"
+    },
+    "+22962000002": {
+      "phone": "+22962000002",
+      "name": "Bernice Dossou",
+      "email": "bernice.dossou@gmail.com",
+      "role": "agent",
+      "points": 2450,
+      "level": "GOLD",
+      "score": 98,
+      "isSuspended": false,
+      "createdAt": "2026-05-12T08:30:00Z"
+    },
+    "+22955000001": {
+      "phone": "+22955000001",
+      "name": "Jean-Jacques Aguin",
+      "email": "jeanjacquesaguin30@gmail.com",
+      "role": "client",
+      "points": 0,
+      "level": "BRONZE",
+      "score": 100,
+      "isSuspended": false,
+      "createdAt": "2026-05-13T10:00:00Z"
+    }
+  },
+  "missions": {
+    "m-1": {
+      "id": "m-1",
+      "title": "Vérification Huile d'Arachide Dantokpa (Cotonou)",
+      "description": "Enquête sur la disponibilité et les prix de vente au détail de l'huile d'arachide de marque 'Auri' et les marques concurrentes au marché Dantokpa. Prendre des photos claires et géolocalisées du rayon d'étalage.",
+      "clientPhone": "+22955000001",
+      "clientName": "Jean-Jacques Aguin",
+      "status": "active",
+      "pointsPerCollect": 120,
+      "budgetAgentFcfa": 1200,
+      "totalCostClientFcfa": 2000,
+      "fields": [
+        {
+          "id": "f-1",
+          "type": "text",
+          "label": "Nom de la boutique / Marchand",
+          "required": true
+        },
+        {
+          "id": "f-2",
+          "type": "number",
+          "label": "Prix bouteille 1L (FCFA)",
+          "required": true
+        },
+        {
+          "id": "f-3",
+          "type": "select",
+          "label": "Disponibilité d'autres marques d'huile",
+          "required": true,
+          "options": [
+            "Seulement Auri",
+            "Auri + Marques concurrentes",
+            "Pas d'huile Auri"
+          ]
+        },
+        {
+          "id": "f-4",
+          "type": "photo",
+          "label": "Photo claire de l'étagère de revente",
+          "required": true
+        },
+        {
+          "id": "f-5",
+          "type": "gps",
+          "label": "Localisation GPS de la collecte",
+          "required": true
+        }
+      ],
+      "zone": {
+        "type": "market",
+        "name": "Marché Dantokpa",
+        "lat": 6.3688,
+        "lng": 2.4411,
+        "radiusKm": 1
+      },
+      "totalRequired": 5,
+      "collectedCount": 2,
+      "createdAt": "2026-05-15T08:00:00Z",
+      "expiresAt": "2026-06-15T23:59:59Z"
+    },
+    "m-2": {
+      "id": "m-2",
+      "title": "Présence Canettes Boissons gazeuses (Porto-Novo)",
+      "description": "Contrôler la présence et le prix public recommandé de canettes de boissons Coca-Cola 33cl et Pepsi 33cl auprès de revendeurs, boutiques de quartier ou supérettes à Porto-Novo.",
+      "clientPhone": "+22955000001",
+      "clientName": "Jean-Jacques Aguin",
+      "status": "active",
+      "pointsPerCollect": 80,
+      "budgetAgentFcfa": 800,
+      "totalCostClientFcfa": 1334,
+      "fields": [
+        {
+          "id": "f-a",
+          "type": "text",
+          "label": "Nom du point de vente",
+          "required": true
+        },
+        {
+          "id": "f-b",
+          "type": "select",
+          "label": "Leader visible en rayon",
+          "required": true,
+          "options": [
+            "Coca-Cola",
+            "Pepsi",
+            "A égalité"
+          ]
+        },
+        {
+          "id": "f-c",
+          "type": "number",
+          "label": "Prix constaté Coca-Cola (FCFA)",
+          "required": true
+        },
+        {
+          "id": "f-d",
+          "type": "photo",
+          "label": "Photo des bouteilles au frais",
+          "required": false
+        },
+        {
+          "id": "f-e",
+          "type": "gps",
+          "label": "Position GPS",
+          "required": true
+        }
+      ],
+      "zone": {
+        "type": "city",
+        "name": "Porto-Novo",
+        "lat": 6.4969,
+        "lng": 2.6289,
+        "radiusKm": 5
+      },
+      "totalRequired": 10,
+      "collectedCount": 0,
+      "createdAt": "2026-05-18T14:00:00Z",
+      "expiresAt": "2026-06-25T23:59:59Z"
+    },
+    "m-3": {
+      "id": "m-3",
+      "title": "Contrôle Ciment Bouclier Cotonou",
+      "description": "Vérifier le coût réel et la disponibilité du sac de Ciment NOCIBE ou SCB en comparaison au prix plafonné par l'État béninois.",
+      "clientPhone": "+22955000001",
+      "clientName": "Jean-Jacques Aguin",
+      "status": "en_attente_paiement",
+      "pointsPerCollect": 150,
+      "budgetAgentFcfa": 1500,
+      "totalCostClientFcfa": 2500,
+      "fields": [
+        {
+          "id": "f1",
+          "type": "text",
+          "label": "Quincaillerie",
+          "required": true
+        },
+        {
+          "id": "f2",
+          "type": "number",
+          "label": "Prix constaté du sac de 50kg (FCFA)",
+          "required": true
+        },
+        {
+          "id": "f3",
+          "type": "boolean",
+          "label": "Facture fournie sur demande ?",
+          "required": true
+        },
+        {
+          "id": "f4",
+          "type": "photo",
+          "label": "Photo extérieure de la quincaillerie",
+          "required": true
+        },
+        {
+          "id": "f5",
+          "type": "gps",
+          "label": "Localisation GPS",
+          "required": true
+        }
+      ],
+      "zone": {
+        "type": "city",
+        "name": "Cotonou",
+        "lat": 6.3654,
+        "lng": 2.4183,
+        "radiusKm": 8
+      },
+      "totalRequired": 8,
+      "collectedCount": 0,
+      "createdAt": "2026-05-19T10:00:00Z",
+      "expiresAt": "2026-06-10T23:59:59Z"
+    }
+  },
+  "submissions": {
+    "s-1": {
+      "id": "s-1",
+      "missionId": "m-1",
+      "missionTitle": "Vérification Huile d'Arachide Dantokpa (Cotonou)",
+      "agentPhone": "+22962000002",
+      "agentName": "Bernice Dossou",
+      "status": "approved",
+      "answers": {
+        "f-1": "Établissements Gbogan, Allée Centrale Dantokpa",
+        "f-2": "1350",
+        "f-3": "Auri + Marques concurrentes"
+      },
+      "photoUrl": "placeholder_arachide_approved",
+      "gpsLocation": {
+        "lat": 6.3685,
+        "lng": 2.441
+      },
+      "fraudScore": "faible",
+      "fraudAlerts": [],
+      "createdAt": "2026-05-16T10:15:00Z"
+    },
+    "s-2": {
+      "id": "s-2",
+      "missionId": "m-1",
+      "missionTitle": "Vérification Huile d'Arachide Dantokpa (Cotonou)",
+      "agentPhone": "+22961000001",
+      "agentName": "Saliou Koffi",
+      "status": "approved",
+      "answers": {
+        "f-1": "Boutique Chez Maman Chérie, Zone Ouest Dantokpa",
+        "f-2": "1400",
+        "f-3": "Seulement Auri"
+      },
+      "photoUrl": "placeholder_arachide_approved_2",
+      "gpsLocation": {
+        "lat": 6.369,
+        "lng": 2.4415
+      },
+      "fraudScore": "faible",
+      "fraudAlerts": [],
+      "createdAt": "2026-05-17T11:45:00Z"
+    },
+    "s-3": {
+      "id": "s-3",
+      "missionId": "m-1",
+      "missionTitle": "Vérification Huile d'Arachide Dantokpa (Cotonou)",
+      "agentPhone": "+22961000001",
+      "agentName": "Saliou Koffi",
+      "status": "pending",
+      "answers": {
+        "f-1": "Kiosque d'en face, Boutique Gbogan",
+        "f-2": "1340",
+        "f-3": "Pas d'huile Auri"
+      },
+      "photoUrl": "placeholder_arachide_approved",
+      "gpsLocation": {
+        "lat": 6.3685,
+        "lng": 2.441
+      },
+      "fraudScore": "eleve",
+      "fraudAlerts": [
+        "Photo identique à la collecte s-1 (Bernice Dossou)",
+        "Position GPS identique à la collecte s-1 à moins de 5 mètres"
+      ],
+      "createdAt": "2026-05-19T17:00:00Z"
+    }
+  },
+  "withdrawals": {
+    "w-1": {
+      "id": "w-1",
+      "agentPhone": "+22962000002",
+      "agentName": "Bernice Dossou",
+      "pointsQuantity": 1500,
+      "amountFcfa": 15000,
+      "status": "pending",
+      "paymentMethod": "MTN MoMo (+22955256871)",
+      "createdAt": "2026-05-18T19:00:00Z"
+    }
+  },
+  "supportTickets": {
+    "t-1": {
+      "id": "t-1",
+      "senderPhone": "+22961000001",
+      "senderName": "Saliou Koffi",
+      "category": "gps_photo",
+      "description": "Mon GPS ne semble pas se mettre à jour sur la carte quand je suis à l'intérieur du grand hangar de Dantokpa.",
+      "createdAt": "2026-05-18T15:20:00Z"
+    }
+  },
+  "notifications": {
+    "55256871": [
+      {
+        "id": "n-1779221506422",
+        "recipientPhone": "55256871",
+        "title": "Bienvenue sur DataBroker229 !",
+        "message": "Bonjour A. Jean. Slogan officiel : \"Des données terrain fiables, partout au Bénin.\" Notre équipe vous souhaite un bon succès !",
+        "isRead": false,
+        "createdAt": "2026-05-19T20:11:46.422Z"
+      }
+    ],
+    "+22961000001": [
+      {
+        "id": "n-1",
+        "recipientPhone": "+22961000001",
+        "title": "Nouvelle Mission Disponible",
+        "message": "La mission 'Présence Canettes Boissons gazeuses (Porto-Novo)' est désormais ouverte !",
+        "isRead": false,
+        "createdAt": "2026-05-18T14:02:00Z"
+      }
+    ],
+    "+22962000002": [
+      {
+        "id": "n-2",
+        "recipientPhone": "+22962000002",
+        "title": "Collecte Validée 🇨🇳",
+        "message": "Félicitations Bernice, votre collecte s-1 a été validée d'un score parfait de 95% +120 points !",
+        "isRead": false,
+        "createdAt": "2026-05-17T09:00:00Z"
+      }
+    ]
+  },
+  "fraudLogs": [
+    {
+      "id": "fl-1",
+      "submissionId": "s-3",
+      "agentPhone": "+22961000001",
+      "type": "duplicate_photo",
+      "description": "La base64/photo fournie correspond exactement à la signature de s-1.",
+      "severity": "high",
+      "createdAt": "2026-05-19T17:00:05Z"
+    },
+    {
+      "id": "fl-2",
+      "submissionId": "s-3",
+      "agentPhone": "+22961000001",
+      "type": "gps_duplicate",
+      "description": "Le point de géolocalisation correspond exactement au point s-1.",
+      "severity": "medium",
+      "createdAt": "2026-05-19T17:00:07Z"
+    }
+  ],
+  "platformConfig": {
+    "marginPercent": 40,
+    "minGpsDistanceMeters": 50,
+    "pointsToFcfaRate": 10
+  }
+}

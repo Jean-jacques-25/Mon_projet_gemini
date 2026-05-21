@@ -1,0 +1,563 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de Bord | DataBroker229 🇧🇯{% endblock %}
+
+{% block content %}
+<div class="h-full flex flex-col bg-slate-50 min-h-screen">
+
+    <!-- PLATFORM NAVBAR -->
+    <header class="flex flex-col md:flex-row items-stretch md:items-center justify-between px-4 md:px-8 py-4 bg-white border-b border-slate-200/80 gap-4 shadow-sm z-30">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md">
+                DB229
+            </div>
+            <div>
+                <h1 class="text-lg font-black tracking-tight text-slate-900 leading-none">DataBroker229 <span class="text-emerald-600 underline decoration-yellow-400">🇧🇯</span></h1>
+                <p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold mt-1">Bénin • Des données terrain fiables</p>
+            </div>
+        </div>
+
+        <!-- Role Selectors, Gamification, Helper actions -->
+        <div class="flex flex-wrap items-center gap-3 md:gap-4 scrollbar-none">
+            
+            <!-- Target Role Swapper -->
+            <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
+                <button id="nav-agent-tab-btn" onclick="changeWorkspaceRole('agent')" class="px-3 py-1 text-xs font-bold rounded-md transition-all bg-white text-emerald-700 shadow-sm">
+                    Agent
+                </button>
+                <button id="nav-client-tab-btn" onclick="changeWorkspaceRole('client')" class="px-3 py-1 text-xs font-bold rounded-md transition-all text-slate-500 hover:text-slate-900">
+                    Client
+                </button>
+                <button id="nav-admin-tab-btn" onclick="changeWorkspaceRole('admin')" class="hidden px-3 py-1 text-xs font-bold rounded-md transition-all text-red-500 hover:text-red-700 items-center gap-1">
+                    <i data-lucide="shield" class="w-3.5 h-3.5"></i> Admin
+                </button>
+            </div>
+
+            <!-- Agent Bonus Gamification Indicator -->
+            <div id="nav-gamification-box" class="hidden lg:flex flex-col items-end border-l border-slate-200 pl-4 leading-none">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Niveau Actuel</span>
+                <div class="flex items-center space-x-1.5 mt-0.5">
+                    <span id="nav-level-badge" class="px-2 py-0.5 text-[9px] font-extrabold rounded-full border bg-slate-100 border-slate-200">
+                        BRONZE
+                    </span>
+                    <span id="nav-points-badge" class="text-base font-black text-emerald-600 italic">
+                        0 pts
+                    </span>
+                </div>
+            </div>
+
+            <!-- Chatbot Aid Trigger -->
+            <button onclick="toggleChatbotOverlay(true)" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors flex items-center gap-1 text-xs font-bold ring-1 ring-slate-200/50">
+                <i data-lucide="help-circle" class="w-4 h-4 text-emerald-600"></i>
+                <span class="hidden sm:inline">Aide IA</span>
+            </button>
+
+            <!-- Notification Bell Panel -->
+            <div class="relative">
+                <button onclick="toggleNotificationDropdown()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors relative ring-1 ring-slate-200/50">
+                    <i data-lucide="bell" class="w-4 h-4"></i>
+                    <span id="notif-count-badge" class="hidden absolute top-0.5 right-0.5 w-3.5 h-3.5 bg-rose-500 text-white rounded-full text-[8px] font-mono font-black flex items-center justify-center animate-pulse">0</span>
+                </button>
+                
+                <!-- Notification dropdown overlay widget -->
+                <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200/80 z-50 overflow-hidden">
+                    <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                        <span class="font-extrabold text-[11px] text-slate-600 uppercase tracking-widest">Informations Bénin</span>
+                        <button onclick="markAllNotificationsAsRead()" class="text-[10px] font-bold text-emerald-600 hover:underline">Tout lire</button>
+                    </div>
+                    <div id="notif-logs-container" class="max-h-56 overflow-y-auto divide-y divide-slate-100 text-[11px] p-2">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- User details and logout -->
+            <div class="flex items-center space-x-2 border-l border-slate-250 pl-4">
+                <div class="hidden sm:block text-right leading-none">
+                    <div id="nav-user-name" class="text-xs font-black text-slate-800 tracking-tight max-w-[110px] truncate">Nom Utilisateur</div>
+                    <div id="nav-user-phone" class="text-[9px] text-slate-400 font-mono mt-0.5">+22900000000</div>
+                </div>
+                <button onclick="logoutSession()" class="px-2 py-1 text-xs font-bold ring-1 ring-slate-200 hover:ring-rose-200 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all">Quitter</button>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- CONTENT BODY LAYER -->
+    <main class="flex-1 p-4 md:p-6 space-y-6 z-10 relative max-w-7xl w-full mx-auto">
+        
+        <!-- ================= 1. AGENT WORKSPACE VIEW ================= -->
+        <section id="workspace-agent" class="space-y-6">
+            
+            <!-- Agent KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Solde Cagnotte</span>
+                    <h3 id="agent-points-total" class="text-2xl font-black text-slate-900 mt-1">0 <span class="text-xs font-medium text-slate-400 font-mono">pts</span></h3>
+                    <p id="agent-fcfa-total" class="text-[11px] text-emerald-600 font-bold mt-0.5">~ 0 FCFA</p>
+                </div>
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Collectes Conformes</span>
+                    <h3 id="agent-approved-count" class="text-2xl font-black text-emerald-600 mt-1">0</h3>
+                    <p id="agent-level-description" class="text-[11px] text-slate-450 mt-0.5">Ratio conformité : 100%</p>
+                </div>
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">En attente d'avis</span>
+                    <h3 id="agent-pending-count" class="text-2xl font-black text-yellow-600 mt-1">0</h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Modération sous 24h</p>
+                </div>
+                <div class="bg-[#121b15] text-white p-5 rounded-3xl shadow-lg flex flex-col justify-between">
+                    <div>
+                        <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest block">Barème Bénin</span>
+                        <h4 class="text-base font-black mt-1">1 Point = 10 FCFA</h4>
+                    </div>
+                    <p class="text-[10px] text-slate-350 italic mt-2">Délai virement : Instantané par Mobile Money.</p>
+                </div>
+            </div>
+
+            <!-- Main Agent Interface -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Column: Map & Active Missions Directory -->
+                <div class="lg:col-span-8 space-y-6">
+                    
+                    <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center border-b pb-3 border-slate-100">
+                            <div>
+                                <h4 class="font-black text-slate-900 text-base flex items-center gap-1.5">
+                                    <i data-lucide="compass" class="w-5 h-5 text-emerald-600"></i>
+                                    Missions géolocalisées ouvertes au Bénin
+                                </h4>
+                                <p class="text-xs text-slate-400 mt-0.5">Activez la géolocalisation pour calculer l'écart géographique requis.</p>
+                            </div>
+                            <span id="agent-gps-feedback" class="text-[9px] font-bold text-rose-500 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-full uppercase tracking-tighter">Attente GPS...</span>
+                        </div>
+
+                        <!-- Leaflet map container -->
+                        <div id="map" class="h-64 md:h-80 rounded-2xl border border-slate-100 z-10 relative overflow-hidden"></div>
+
+                        <!-- Search filters -->
+                        <div class="flex gap-2">
+                            <input type="text" id="agent-city-filter-input" onkeyup="filterAgentMissions()" placeholder="Filtrer par ville (ex: Dantokpa, Porto-Novo)..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-900 focus:outline-emerald-600" />
+                            <button onclick="switchProximitySort(true)" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Plus proches
+                            </button>
+                        </div>
+
+                        <!-- Directory table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600 divide-y divide-slate-100">
+                                <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    <tr>
+                                        <th class="p-3">Sujet de la mission / Zone</th>
+                                        <th class="p-3">Exigences</th>
+                                        <th class="p-3 text-right">Rémunération</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="agent-missions-tbody" class="divide-y divide-slate-100">
+                                    <!-- Dynamic records -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Interactive Questionnaire or Cashout widget -->
+                <div class="lg:col-span-4 space-y-6">
+                    
+                    <!-- DYNAMIC SUBMISSION FORM CARD -->
+                    <div id="form-submission-card" class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+                        <div class="border-b pb-3 border-slate-100 text-center">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block font-mono">Module de saisie de données</span>
+                            <h4 id="form-selected-title" class="font-extrabold text-sm text-slate-900 mt-1">Sélectionnez une mission</h4>
+                            <p id="form-selected-desc" class="text-[11px] text-slate-500 mt-1">Cliquez sur une mission de la liste ou de la carte pour déverrouiller le questionnaire.</p>
+                        </div>
+
+                        <div id="form-inner-fields" class="hidden space-y-4">
+                            <form id="submission-form" onsubmit="submitAgentData(event)" class="space-y-4">
+                                <input type="hidden" id="form-mission-id" />
+                                
+                                <!-- Placeholder for programmatic rendering -->
+                                <div id="programmatic-fields-container" class="space-y-3 text-xs"></div>
+
+                                <!-- Local Geolocation and Camera constraints standard inputs -->
+                                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/60 text-xs space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-bold text-slate-700">Photos justificatives obligatoires</span>
+                                        <span class="text-[9px] text-emerald-600 font-bold">Base64 Converter</span>
+                                    </div>
+                                    <input type="file" id="form-upload-photo" required accept="image/*" onchange="convertPhotoToBase64()" class="w-full bg-white border border-slate-200 rounded px-2 py-1 text-[11px]" />
+                                    <input type="hidden" id="form-photo-base64" />
+                                    
+                                    <hr class="border-slate-200" />
+
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-bold text-slate-700">Ancrage GPS obligatoire</span>
+                                        <button type="button" onclick="fetchFormGps()" class="bg-emerald-600 text-slate-900 text-[10px] font-black px-2 py-0.5 rounded uppercase">Détecter</button>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                                        <div class="bg-white px-2 py-1.5 rounded border">Lat: <span id="form-gps-lat" class="font-bold">--</span></div>
+                                        <div class="bg-white px-2 py-1.5 rounded border">Lng: <span id="form-gps-lng" class="font-bold">--</span></div>
+                                    </div>
+                                </div>
+
+                                <div id="form-submit-error" class="hidden text-[10px] text-rose-600 font-bold bg-rose-50 p-2 border border-rose-200 rounded-lg"></div>
+
+                                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-slate-900 py-2.5 rounded-xl uppercase tracking-widest text-xs font-black transition-all">
+                                    Valider & Soumettre ma collecte
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- MOBILE MONEY CASH-OUT CONTAINER -->
+                    <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+                        <h4 class="font-black text-slate-900 text-sm flex items-center gap-1.5">
+                            <i data-lucide="credit-card" class="w-4 h-4 text-emerald-600"></i>
+                            Demander un Virement Mobile Money
+                        </h4>
+                        
+                        <form onsubmit="withdrawalPoints(event)" class="space-y-3.5 text-xs">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nombre de points à vider *</label>
+                                <input type="number" id="withdraw-points" required min="50" step="10" placeholder="Ex: 100" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-bold font-mono" />
+                                <span class="block text-[10px] text-slate-400 mt-1">Équivalence : <span id="withdraw-equivalence" class="font-bold text-emerald-600">0 FCFA</span> (Min : 50 pts)</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Type de Réseau & Numéro MoMo Bénin *</label>
+                                <select id="withdraw-method" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 font-bold mb-2">
+                                    <option value="MTN MoMo">MTN Mobile Money</option>
+                                    <option value="Moov Money">Moov Flooz</option>
+                                    <option value="Celtiis Cash">Celtiis Cash</option>
+                                </select>
+                                <input type="tel" id="withdraw-payment-details" required placeholder="Tapez le numéro de virement..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-mono font-bold" />
+                            </div>
+
+                            <div id="withdrawal-error" class="hidden text-[10px] text-rose-600 font-bold bg-rose-50 p-2 border border-rose-250 rounded-lg"></div>
+                            <div id="withdrawal-success" class="hidden text-[10px] text-emerald-600 font-bold bg-emerald-50 p-2 border border-emerald-250 rounded-lg"></div>
+
+                            <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-black uppercase text-[10px] py-2 rounded-xl">
+                                Déclencher le paiement MoMo
+                            </button>
+                        </form>
+
+                        <div class="rounded-2xl bg-yellow-50 border border-yellow-200 p-3 leading-relaxed text-[11px] text-yellow-800">
+                            <b>Régulation Anti-Fraude</b> : Les dossiers de retrait font l'objet d'un examen automatique croisant vos positions GPS et les hashs d'images. Aucun abus de fraude ne sera toléré.
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================= 2. CLIENT WORKSPACE VIEW ================= -->
+        <section id="workspace-client" class="hidden space-y-6">
+            
+            <!-- Client KPIs -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Vos Mégaphones Actifs</span>
+                    <h3 id="client-active-missions-count" class="text-2xl font-black text-slate-900 mt-1">0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Dépôts impayés</span>
+                    <h3 id="client-unpaid-missions-count" class="text-2xl font-black text-amber-600 mt-1">0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Relevés Reçus</span>
+                    <h3 id="client-total-submissions-count" class="text-2xl font-black text-emerald-600 mt-1">0</h3>
+                </div>
+                <div class="bg-[#121b15] text-white p-5 rounded-3xl shadow-lg leading-tight flex flex-col justify-between">
+                    <div>
+                        <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest block">Marge de plateforme</span>
+                        <h4 class="text-lg font-black mt-1">Markup standard : 40%</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client controls creator grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left panel: creator forms with AI suggest -->
+                <div class="lg:col-span-8 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-6">
+                    <div>
+                        <h4 class="font-black text-slate-900 text-base flex items-center gap-1.5 animate-pulse">
+                            <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-600"></i>
+                            Commander un nouveau sondage commercial au Bénin
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Décrivez votre problème en texte libre et l'algorithme Gemini configurera le questionnaire idéal.</p>
+                    </div>
+
+                    <!-- AI SUGGEST WIDGET -->
+                    <div class="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl items-end space-y-3 text-xs">
+                        <label class="block font-black text-emerald-800 uppercase text-[10px] tracking-wider flex items-center gap-1">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i>
+                            Configuration automatique des formulaires par l'IA (Gemini)
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" id="client-ai-prompt" placeholder="Ex: prix sac 25kg riz à Dantokpa, présence d'étals..." class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 focus:outline-emerald-600 font-bold" />
+                            <button id="client-ai-suggest-btn" onclick="suggestMissionsViaGemini()" class="bg-slate-900 hover:bg-slate-800 text-white font-black px-4 py-1.5 rounded-xl transition-all">Suggérer 🪄</button>
+                        </div>
+                    </div>
+
+                    <!-- Manual creation fields -->
+                    <form onsubmit="createNewMission(event)" class="space-y-4 text-xs">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-slate-600 font-bold mb-1">Nom descriptif de l'enquête *</label>
+                                <input type="text" id="create-m-title" required placeholder="Ex : Audit Disponibilité Savon Fanico" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-bold focus:bg-white" />
+                            </div>
+                            <div>
+                                <label class="block text-slate-600 font-bold mb-1">Portée de l'étude (Nombre de collectes souhaitées) *</label>
+                                <input type="number" id="create-m-total-required" required min="5" value="10" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-mono font-bold" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-600 font-bold mb-1">Description & Consignes strictes pour les agents collecteurs *</label>
+                            <textarea id="create-m-description" required rows="3" placeholder="Tapez précisément comment l'enquêteur doit interroger le commerçant..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:bg-white"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/50">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Zone géographique cible</label>
+                                <select id="create-m-zone-type" class="w-full bg-white border border-slate-200 rounded p-1 font-bold">
+                                    <option value="city">Ville entière</option>
+                                    <option value="market">Marché de revente</option>
+                                    <option value="radius">Géo-portée (Rayon)</option>
+                                    <option value="any">National Bénin</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Nom de la ville / marché</label>
+                                <input type="text" id="create-m-zone-name" value="Cotonou" class="w-full bg-white border border-slate-200 rounded p-1 font-bold" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 mb-1">Prime agent unitaire (FCFA) *</label>
+                                <input type="number" id="create-m-budget-agent" min="500" step="50" value="1200" oninput="recalculateClientPricingEstimates()" class="w-full bg-white border border-slate-200 rounded p-1 font-bold font-mono text-emerald-600" />
+                            </div>
+                        </div>
+
+                        <!-- Questionnaire configuration program design module -->
+                        <div class="border border-slate-200 rounded-2xl p-4 bg-white space-y-3">
+                            <div class="flex justify-between items-center border-b pb-2">
+                                <span class="font-bold text-slate-800">Spécification des questions (Formulaire Dynamique)</span>
+                                <span id="create-m-fields-count" class="text-[10px] text-emerald-600 font-bold font-mono">2 champs configurés</span>
+                            </div>
+                            
+                            <!-- Dynamic stack loaded by JS -->
+                            <div id="create-m-fields-stack" class="divide-y max-h-40 overflow-y-auto space-y-1"></div>
+
+                            <!-- Fast inline insertion widget -->
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 pt-2 items-end">
+                                <div class="md:col-span-2">
+                                    <label class="block text-[10px] text-slate-400">Question à poser</label>
+                                    <input type="text" id="create-m-new-label" placeholder="Prix relevé..." class="w-full bg-slate-50 border rounded px-2 py-1" />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-slate-400">Format</label>
+                                    <select id="create-m-new-type" class="w-full bg-slate-50 border rounded p-1">
+                                        <option value="text">Texte libre</option>
+                                        <option value="number">Chiffres</option>
+                                        <option value="boolean">Oui/Non</option>
+                                        <option value="select">Menu d'options</option>
+                                        <option value="photo">Photo requise</option>
+                                        <option value="gps">Coordonnées GPS</option>
+                                    </select>
+                                </div>
+                                <button type="button" onclick="addFieldToCreationMission()" class="bg-slate-900 text-white py-1.5 rounded font-bold hover:bg-slate-800">Ajouter</button>
+                            </div>
+                        </div>
+
+                        <!-- Price summary devis calculator -->
+                        <div class="bg-slate-900 text-white p-4 rounded-2xl flex justify-between items-center gap-4">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block">Decompte de paiement DataBroker229</span>
+                                <p class="text-[9px] text-slate-500 italic">Marge de plateforme officielle (40% inclus)</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] font-bold text-emerald-400">Total payé du dossier</span>
+                                <h3 id="create-m-pricing-total" class="text-xl font-black text-yellow-300 font-mono">0 <span class="text-xs">FCFA</span></h3>
+                            </div>
+                        </div>
+
+                        <div id="client-create-error" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 p-3 rounded-lg font-bold"></div>
+                        <div id="client-create-success" class="hidden text-xs text-emerald-600 bg-emerald-50 border border-emerald-250 p-3 rounded-lg font-bold"></div>
+
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-slate-900 font-black py-3 rounded-xl uppercase tracking-wider">
+                            Enregistrer & Déposer la mission
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right panel: Active Sponsor Missions files -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+                        <h4 class="font-black text-slate-900 text-sm flex items-center gap-1">
+                            <i data-lucide="list" class="w-4 h-4 text-emerald-600"></i> Vos Enquêtes en cours
+                        </h4>
+
+                        <div id="client-missions-container" class="space-y-3">
+                            <!-- JS Inject -->
+                        </div>
+                    </div>
+
+                    <!-- Client historical submissions reviews -->
+                    <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-3">
+                        <span class="text-xs font-bold text-slate-800 block">Dernières données reçues conformes</span>
+                        <div id="client-submissions-notif" class="space-y-2 max-h-56 overflow-y-auto text-[11px]">
+                            <!-- JS Inject -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================= 3. ADMIN WORKSPACE VIEW ================= -->
+        <section id="workspace-admin" class="hidden space-y-6">
+            
+            <!-- Statistics Admin -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-[9px] uppercase font-bold text-slate-400 leading-none">Profits Plateforme</p>
+                        <h3 id="admin-kpi-revenues" class="text-xl font-black mt-1">0 <span class="text-xs">FCFA</span></h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <i data-lucide="users" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-[9px] uppercase font-bold text-slate-400 leading-none">Réseau d'utilisateurs</p>
+                        <h3 id="admin-kpi-users" class="text-xl font-black mt-1">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-rose-50 text-rose-600 rounded-xl">
+                        <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-[9px] uppercase font-bold text-slate-400 leading-none">Alertes Fraudes</p>
+                        <h3 id="admin-kpi-frauds" class="text-xl font-black mt-1">0</h3>
+                    </div>
+                </div>
+                <div class="bg-[#121b15] text-white p-5 rounded-3xl shadow-lg flex items-center gap-4">
+                    <div class="p-2.5 bg-yellow-400 text-slate-900 rounded-xl font-black text-xs">BENIN</div>
+                    <div>
+                        <p class="text-[8px] uppercase font-bold text-emerald-400">DATABASE DIRECT LINK</p>
+                        <h3 class="text-base font-black uppercase">ACTIVE</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validation Queue lists -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left panel: Submissions Queue comparison panels -->
+                <div class="lg:col-span-8 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-6">
+                    <div class="border-b pb-3 flex justify-between items-center">
+                        <h4 class="font-black text-slate-900 text-base flex items-center gap-1.5 animate-pulse">
+                            <i data-lucide="file-check" class="w-5 h-5 text-emerald-600"></i>
+                            File de vérification de collectes terrain
+                        </h4>
+                        <span id="admin-val-queue-count" class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-mono">0 dossiers</span>
+                    </div>
+
+                    <div id="admin-submissions-queue" class="space-y-6">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Right panel: Parameter adjustments & withdraw queues -->
+                <div class="lg:col-span-4 space-y-6">
+                    
+                    <!-- Withdrawal money validation -->
+                    <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+                        <h4 class="font-black text-slate-900 text-sm flex items-center gap-1.5">
+                            <i data-lucide="credit-card" class="w-4 h-4 text-emerald-600"></i>
+                            Demandes de retraits MoMo en attente
+                        </h4>
+                        <div id="admin-withdrawals-queue" class="space-y-3">
+                            <!-- Inject by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Platform configuration modifiers -->
+                    <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-3 text-xs">
+                        <h4 class="font-bold text-slate-800 text-xs flex items-center gap-1"><i data-lucide="sliders" class="w-4 h-4 text-emerald-600"></i> Ajustement Paramètres</h4>
+                        
+                        <form onsubmit="saveAdminConfig(event)" class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Commission Plateforme (%)</label>
+                                <input type="number" id="admin-cfg-margin" min="10" max="80" class="w-full bg-slate-50 border rounded px-2.5 py-1.5 font-bold" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Voisinage GPS Anti-Fraude (mètres)</label>
+                                <input type="number" id="admin-cfg-dist" min="10" max="1000" class="w-full bg-slate-50 border rounded px-2.5 py-1.5 font-bold" />
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-slate-900 font-bold py-1.5 rounded-xl uppercase text-[10px]">Sauvegarder</button>
+                        </form>
+                    </div>
+
+                    <!-- suspened agents alert logs -->
+                    <div class="bg-slate-900 text-white p-5 rounded-3xl space-y-3">
+                        <h5 class="text-xs font-bold text-yellow-300">Journal des Suspensions / Fraudes</h5>
+                        <div id="admin-fraud-logs-stack" class="space-y-2 max-h-48 overflow-y-auto text-[10px]">
+                            <!-- Inject JS -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FLOATING CHATBOT AI SIDE PANEL OVERLAY -->
+    <div id="chatbot-panel" class="hidden fixed bottom-6 right-6 w-80 md:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 z-50 overflow-hidden flex flex-col h-96">
+        <div class="bg-emerald-600 p-4 text-white flex justify-between items-center shrink-0">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center font-black">AI</div>
+                <div>
+                    <h5 class="text-xs font-black">Support Assistant Intelligent</h5>
+                    <p class="text-[9px] text-emerald-100">Bénin • Réponses instantanées</p>
+                </div>
+            </div>
+            <button onclick="toggleChatbotOverlay(false)" class="p-1.5 hover:bg-white/10 rounded-lg"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <!-- Scroll messages layer -->
+        <div id="chatbot-messages-box" class="flex-1 p-3 overflow-y-auto space-y-2.5 text-xs bg-slate-50">
+            <div class="bg-white border rounded-2xl p-2.5 max-w-[85%] self-start leading-relaxed text-slate-700">
+                Bonjour ! Slogan de notre plateforme : <b>"Des données terrain fiables, partout au Bénin."</b> comment puis-je vous aider aujourd'hui ?
+            </div>
+        </div>
+
+        <!-- Message inputs -->
+        <div class="p-2 border-t bg-white flex gap-1 items-center shrink-0">
+            <input type="text" id="chatbot-user-input" onkeyup="if(event.key === 'Enter') sendChatbotMessage()" placeholder="Posez une question technique ou barème..." class="flex-1 bg-slate-50 border rounded-xl px-2.5 py-1.5 text-xs focus:outline-emerald-600" />
+            <button onclick="sendChatbotMessage()" class="p-2 bg-emerald-600 text-white rounded-xl"><i data-lucide="send" class="w-4 h-4"></i></button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modular JS variables bootstrap and routing logic hook -->
+<script src="/static/js/main.js"></script>
+<script src="/static/js/agent.js"></script>
+<script src="/static/js/client.js"></script>
+<script src="/static/js/admin.js"></script>
+<script src="/static/js/chatbot.js"></script>
+{% endblock %}

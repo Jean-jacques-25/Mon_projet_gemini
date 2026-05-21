@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion Onboarding | DataBroker229 🇧🇯{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col justify-between bg-slate-50 relative overflow-hidden">
+    
+    <!-- Background graphical patterns -->
+    <div class="absolute inset-0 z-0 opacity-[0.03] pointer-events-none">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="1"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+    </div>
+
+    <!-- Header / Branding logo banner -->
+    <header class="w-full px-6 py-4 flex justify-between items-center bg-white/80 backdrop-blur border-b border-slate-200/60 z-10 relative">
+        <div class="flex items-center space-x-2">
+            <div class="w-9 h-9 bg-emerald-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-emerald-200 shadow-lg">
+                DB229
+            </div>
+            <div>
+                <h1 class="text-lg font-black tracking-tight text-slate-900 leading-none">DataBroker229 <span class="text-emerald-600 underline decoration-yellow-400">🇧🇯</span></h1>
+                <p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold mt-0.5">Bénin • Slogan Officiel</p>
+            </div>
+        </div>
+        <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full uppercase tracking-widest font-mono">PWA Native Build</span>
+    </header>
+
+    <!-- Main form grids -->
+    <main class="w-full max-w-md mx-auto px-4 py-8 flex-1 flex flex-col justify-center relative z-10">
+        
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl space-y-6">
+            
+            <!-- Tab switches: Connection vs Inscription -->
+            <div class="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200/50">
+                <button id="tab-login-btn" onclick="toggleAuthTab('login')" class="flex-1 text-center py-2 text-xs font-black rounded-lg transition-all bg-white text-slate-900 shadow-sm">
+                    Connexion Rapide
+                </button>
+                <button id="tab-register-btn" onclick="toggleAuthTab('register')" class="flex-1 text-center py-2 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-800">
+                    Nouveau Compte
+                </button>
+            </div>
+
+            <!-- Description message slogan -->
+            <div class="text-center">
+                <h3 class="text-xl font-black text-slate-900 tracking-tight">Des données terrain fiables, partout au Bénin.</h3>
+                <p class="text-xs text-slate-400 mt-1">Authentification sécurisée par numéro de téléphone.</p>
+            </div>
+
+            <!-- ERROR ALERT BOX -->
+            <div id="auth-error-box" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 p-3 rounded-xl font-bold animate-shake"></div>
+            
+            <!-- FORMCONNEXION (ACTIVE BY DEFAULT) -->
+            <form id="form-login" onsubmit="handleAuthSubmit(event, 'login')" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1">Votre numéro WhatsApp Bénin (+229) *</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-xs font-bold text-slate-400 font-mono">+229</span>
+                        <input type="tel" name="phone" id="login-phone" required placeholder="96000000" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-14 pr-3 py-2 text-xs font-mono text-slate-900 focus:bg-white focus:outline-emerald-600 transition-all font-bold" />
+                    </div>
+                    <span class="block text-[10px] text-slate-400 mt-1">Saisissez les 8 chiffres restants de votre opérateur (MTN, Moov, Celtiis).</span>
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-slate-900 text-xs font-extrabold py-3 rounded-xl uppercase tracking-widest transition-all shadow-lg active:scale-95">
+                    Entrer dans mon espace
+                </button>
+            </form>
+
+            <!-- FORMINSCRIPTION (HIDDEN BY DEFAULT) -->
+            <form id="form-register" onsubmit="handleAuthSubmit(event, 'register')" class="hidden space-y-4">
+                <div>
+                    <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1">Prénom & Nom du Collecteur / Enquêteur *</label>
+                    <input type="text" id="register-name" required placeholder="Ex : Koffi Saliou" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-emerald-600 font-bold" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1">Votre numéro WhatsApp (+229) *</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-xs font-bold text-slate-400 font-mono">+229</span>
+                        <input type="tel" id="register-phone" required placeholder="96000000" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-14 pr-3 py-2 text-xs font-mono text-slate-900 focus:bg-white focus:outline-emerald-600 font-bold" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1">Rôle Principal de votre Compte *</label>
+                    <select id="register-role" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-800">
+                        <option value="agent">Collecteur de Terrain (Agent) Bénin</option>
+                        <option value="client">Client d'Enquêtes (Sponsor de Marques)</option>
+                    </select>
+                    <p class="text-[10px] text-slate-400 mt-1">Note : En tant qu'Agent, vous serez payé 500 FCFA à 1500 FCFA par formulaire validé !</p>
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-slate-900 text-xs font-extrabold py-3 rounded-xl uppercase tracking-widest transition-all shadow-lg">
+                    S'inscrire officiellement
+                </button>
+            </form>
+
+            <!-- DEMO ACCESSIBILITY SELECTOR PANEL -->
+            <div class="border-t border-slate-100 pt-4 space-y-2">
+                <span class="block text-[10px] text-center font-bold text-slate-400 uppercase tracking-widest">Accès d'évaluation de démonstration</span>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="fillAndLogPhone('+22961000001')" class="bg-slate-100 p-2 rounded-xl text-center text-[10px] font-bold text-slate-700 hover:bg-slate-200 border border-slate-200 hover:border-slate-300 transition-colors">
+                        👤 Agent (Koffi)
+                    </button>
+                    <button onclick="fillAndLogPhone('+22955000001')" class="bg-indigo-50 text-indigo-700 p-2 rounded-xl text-center text-[10px] font-bold border border-indigo-200 hover:bg-indigo-100 transition-colors">
+                        📊 Client Brand
+                    </button>
+                    <button onclick="fillAndLogPhone('+22999999999')" class="bg-slate-900 text-yellow-300 p-2 rounded-xl text-center text-[10px] font-extrabold hover:bg-slate-850 transition-all border border-slate-900">
+                        🛡️ Admin
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer with assistance contacts -->
+    <footer class="w-full py-6 text-center text-slate-400 text-[10px] border-t border-slate-200/50 bg-white relative z-10 space-y-1">
+        <p class="font-bold text-slate-500">DataBroker229 🇧🇯 - Enregistré au Registre du Commerce de Cotonou.</p>
+        <p>Support Téléphonique : jeanjacquesaguin30@gmail.com | WhatsApp: +229 55256871</p>
+    </footer>
+
+</div>
+
+<!-- Authentication logic JavaScript -->
+<script>
+    let activeTab = 'login';
+
+    function toggleAuthTab(tab) {
+        activeTab = tab;
+        const errBox = document.getElementById("auth-error-box");
+        errBox.classList.add("hidden");
+
+        const lForm = document.getElementById("form-login");
+        const rForm = document.getElementById("form-register");
+        const lBtn = document.getElementById("tab-login-btn");
+        const rBtn = document.getElementById("tab-register-btn");
+
+        if (tab === 'login') {
+            lForm.classList.remove("hidden");
+            rForm.classList.add("hidden");
+            lBtn.className = "flex-1 text-center py-2 text-xs font-black rounded-lg transition-all bg-white text-slate-900 shadow-sm";
+            rBtn.className = "flex-1 text-center py-2 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-800";
+        } else {
+            lForm.classList.add("hidden");
+            rForm.classList.remove("hidden");
+            rBtn.className = "flex-1 text-center py-2 text-xs font-black rounded-lg transition-all bg-white text-slate-900 shadow-sm";
+            lBtn.className = "flex-1 text-center py-2 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-800";
+        }
+    }
+
+    function fillAndLogPhone(phone) {
+        // Toggle tab connection
+        toggleAuthTab('login');
+        
+        // Strip prefix +229 for typing
+        let fillNum = phone;
+        if (phone.startsWith("+229")) {
+            fillNum = phone.replace("+229", "");
+        }
+        document.getElementById("login-phone").value = fillNum;
+        
+        // Auto trigger connection
+        setTimeout(() => {
+            const ev = { preventDefault: () => {} };
+            handleAuthSubmit(ev, 'login');
+        }, 150);
+    }
+
+    async function handleAuthSubmit(e, type) {
+        e.preventDefault();
+        const errBox = document.getElementById("auth-error-box");
+        errBox.classList.add("hidden");
+
+        let payload = {};
+        let url = "";
+
+        if (type === 'login') {
+            const rawPhone = document.getElementById("login-phone").value.trim();
+            if (!rawPhone) return;
+            // enforce prefix
+            const formattedPhone = rawPhone.startsWith("+") ? rawPhone : ("+229" + rawPhone);
+            payload = { phone: formattedPhone };
+            url = "/api/connexion";
+        } else {
+            const name = document.getElementById("register-name").value.strip ? document.getElementById("register-name").value.strip() : document.getElementById("register-name").value.trim();
+            const rawPhone = document.getElementById("register-phone").value.trim();
+            const role = document.getElementById("register-role").value;
+            const formattedPhone = rawPhone.startsWith("+") ? rawPhone : ("+229" + rawPhone);
+
+            payload = { name, phone: formattedPhone, role };
+            url = "/api/inscription";
+        }
+
+        try {
+            const resp = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await resp.json();
+            if (!resp.ok) {
+                errBox.innerText = data.error || "Une erreur est survenue.";
+                errBox.classList.remove("hidden");
+            } else {
+                // Save credentials in local cookies/localStorage for offline PWA context persistence
+                localStorage.setItem("databroker_user_phone", data.user.phone);
+                localStorage.setItem("databroker_user_name", data.user.name);
+                localStorage.setItem("databroker_user_role", data.user.role);
+                
+                // Redirect straight to dashboard
+                window.location.href = "/dashboard";
+            }
+        } catch (err) {
+            errBox.innerText = "Erreur de connexion serveur. Vérifiez votre réseau internet.";
+            errBox.classList.remove("hidden");
+        }
+    }
+
+    // Auto reconnect if profile exists in storage
+    window.addEventListener('DOMContentLoaded', () => {
+        const storedPhone = localStorage.getItem("databroker_user_phone");
+        if (storedPhone) {
+            // Pre-fill
+            let innerPhone = storedPhone;
+            if (innerPhone.startsWith("+229")) {
+                innerPhone = innerPhone.replace("+229", "");
+            }
+            document.getElementById("login-phone").value = innerPhone;
+        }
+    });
+</script>
+{% endblock %}
